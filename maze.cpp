@@ -1,13 +1,14 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include "maps.cpp"
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int CELL_SIZE = 40;
 const int NUM_ROWS = SCREEN_HEIGHT / CELL_SIZE;
 const int NUM_COLS = SCREEN_WIDTH / CELL_SIZE;
-
+/*
 int maze[NUM_ROWS][NUM_COLS] = { //12 x 12
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1},
@@ -22,6 +23,8 @@ int maze[NUM_ROWS][NUM_COLS] = { //12 x 12
     {1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1},
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 };
+*/
+int **maze=SelectMap();
 
 
 bool can_move_to_cell(int row, int col) {
