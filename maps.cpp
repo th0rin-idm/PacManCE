@@ -6,7 +6,7 @@ int  **SelectMap(void){
     int maze1[12][12] = { //12 x 12
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
-    {1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1},
     {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1},
     {1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1},
@@ -80,7 +80,8 @@ int maze5[12][12] = { //12 x 12
    int random = std::rand() % 5;
    // sumamos 1 para obtener un número aleatorio entre 1 y 5 (ambos incluidos)
    random += 1;
-    printf("%d",random);
+    //printf("%d",random);
+    std::cout << "Número aleatorio entre 1 y 5: " << random << std::endl;
     if(random==1){
         // Copiar la matriz original a la matriz copia
            maze = new int *[12];
