@@ -28,6 +28,34 @@ int maze[NUM_ROWS][NUM_COLS] = { //12 x 12
 */
 int **maze=SelectMap();
 
+// Función para actualizar la posición del fantasma
+void update_blue_position(SDL_Rect& blueRect, int& blueDestRow, int& blueDestCol, int blueSpeed) {
+    // Calcula la dirección del fantasma (arriba, abajo, izquierda o derecha)
+    int rowDiff = blueDestRow - (blueRect.y / CELL_SIZE);
+    int colDiff = blueDestCol - (blueRect.x / CELL_SIZE);
+
+    if (rowDiff == 0 && colDiff == 0) {
+        // Si el fantasma ya está en su destino, elige un nuevo destino al azar
+        blueDestRow = rand() % NUM_ROWS;
+        blueDestCol = rand() % NUM_COLS;
+    } else {
+        // Mueve el fantasma en la dirección del destino
+        if (abs(rowDiff) >= abs(colDiff)) {
+            if (rowDiff > 0) {
+                blueRect.y += blueSpeed;
+            } else {
+                blueRect.y -= blueSpeed;
+            }
+        } else {
+            if (colDiff > 0) {
+                blueRect.x += blueSpeed;
+            } else {
+                blueRect.x -= blueSpeed;
+            }
+        }
+    }
+}
+
 
 bool can_move_to_cell(int row, int col) {
     return (maze[row][col] == 0);
@@ -51,6 +79,8 @@ int main(int argc, char* args[]) {
     rect.h  = CELL_SIZE;
     bool quit = false;
 
+    int centerX;
+    int centerY;
 
     // Carga la imagen del jugador
     SDL_Surface* pacmanSurface = IMG_Load("sprites/pacman.png");
@@ -85,6 +115,10 @@ int main(int argc, char* args[]) {
     blueRect.w = 20;
     blueRect.h = 20;
 
+    int blueDestRow = 6; // Fila de destino del fantasma azul
+    int blueDestCol = 4; // Columna de destino del fantasma azul
+    int blueSpeed = 1; // Velocidad de movimiento del fantasma azul
+
     SDL_Surface* blackSurface = IMG_Load("sprites/black.png");
     if (!blackSurface) {
         printf("No se pudo cargar la imagen del negro: %s\n", SDL_GetError());
@@ -94,12 +128,15 @@ int main(int argc, char* args[]) {
     SDL_Texture* black = SDL_CreateTextureFromSurface(renderer, blackSurface);
     SDL_FreeSurface(blackSurface); // ya no se necesita la superficie
 
-    // Establece la posición inicial del fantasma
     SDL_Rect blackRect;
-    blackRect.x = 45;
-    blackRect.y = 200;
+    blackRect.x = 35;
+    blackRect.y = 150;
     blackRect.w = 20;
     blackRect.h = 20;
+
+    int blackDestRow = 6; // Fila de destino del fantasma azul
+    int blackDestCol = 4; // Columna de destino del fantasma azul
+    int blackSpeed = 1; // Velocidad de movimiento del fantasma azul
 
     SDL_Surface* yellowSurface = IMG_Load("sprites/yellow.png");
     if (!yellowSurface) {
@@ -110,13 +147,6 @@ int main(int argc, char* args[]) {
     SDL_Texture* yellow = SDL_CreateTextureFromSurface(renderer, yellowSurface);
     SDL_FreeSurface(yellowSurface); // ya no se necesita la superficie
 
-    // Establece la posición inicial del fantasma
-    SDL_Rect yellowRect;
-    yellowRect.x = 45;
-    yellowRect.y = 250;
-    yellowRect.w = 20;
-    yellowRect.h = 20;
-
     SDL_Surface* xtraSurface = IMG_Load("sprites/xtra.png");
     if (!xtraSurface) {
         printf("No se pudo cargar la imagen del xtra: %s\n", SDL_GetError());
@@ -126,15 +156,9 @@ int main(int argc, char* args[]) {
     SDL_Texture* xtra = SDL_CreateTextureFromSurface(renderer, xtraSurface);
     SDL_FreeSurface(xtraSurface); // ya no se necesita la superficie
 
-    // Establece la posición inicial del fantasma
-    SDL_Rect xtraRect;
-    xtraRect.x = 45;
-    xtraRect.y = 300;
-    xtraRect.w = 20;
-    xtraRect.h = 20;
-
     //Cargar la imagen de las monedas
     SDL_Texture* coinTexture = IMG_LoadTexture(renderer, "sprites/coin.png");
+    
     //vector para guardar las monedas
     std::vector<SDL_Rect> coins;
     int score=0;
@@ -143,6 +167,7 @@ int main(int argc, char* args[]) {
     int maxcoins=0;
 
     while (!quit){
+
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -174,7 +199,7 @@ int main(int argc, char* args[]) {
                         break;
                 }
             }
-        }    
+        }
 
         for (int row = 0; row < 12; row++) {
             for (int col = 0; col < 12; col++) {
@@ -183,10 +208,11 @@ int main(int argc, char* args[]) {
                 } else if(maze[row][col]==0){ //azul
                     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                     // Calcula la posición del centro del cuadrado blanco
-                    int centerX = rect.x + CELL_SIZE/2;
-                    int centerY = rect.y + CELL_SIZE/2;
+                    centerX = rect.x + CELL_SIZE/2;
+                    centerY = rect.y + CELL_SIZE/2;
                     int COIN_SIZE = 22;
                     SDL_Rect coinRect = { centerX + 26, centerY - 12, COIN_SIZE, COIN_SIZE };
+                    
                     //SDL_RenderFillRect(renderer, &rect);
                     if(maxcoins<80){
                     coins.push_back(coinRect);
@@ -206,12 +232,72 @@ int main(int argc, char* args[]) {
         for (const auto& coin : coins) {
     SDL_RenderCopy(renderer, coinTexture, nullptr, &coin);
             }   
-        
-        SDL_RenderCopy(renderer, blue, nullptr, &blueRect);
+        //Dibujar los fantasmas
+        // Actualiza la posición del fantasma negro
+        if (blackRect.x < blackDestCol * CELL_SIZE) {
+            if (can_move_to_cell(blackRect.y / CELL_SIZE, (blackRect.x + blackSpeed) / CELL_SIZE)) {
+                blackRect.x += blackSpeed;
+            } else {
+                blueDestCol = blueRect.x / CELL_SIZE;
+            }
+        } else if (blackRect.x > blackDestCol * CELL_SIZE) {
+            if (can_move_to_cell(blackRect.y / CELL_SIZE, (blackRect.x - blackSpeed) / CELL_SIZE)) {
+                blackRect.x -= blackSpeed;
+            } else {
+                blackDestCol = blackRect.x / CELL_SIZE;
+            }
+        } else if (blackRect.y < blackDestRow * CELL_SIZE) {
+            if (can_move_to_cell((blackRect.y + blackSpeed) / CELL_SIZE, blackRect.x / CELL_SIZE)) {
+                blackRect.y += blackSpeed;
+            } else {
+                blackDestRow = blackRect.y / CELL_SIZE;
+            }
+        } else if (blueRect.y > blueDestRow * CELL_SIZE) {
+            if (can_move_to_cell((blueRect.y - blackSpeed) / CELL_SIZE, blackRect.x / CELL_SIZE)) {
+                blackRect.y -= blackSpeed;
+            } else {
+                blackDestRow = blackRect.y / CELL_SIZE;
+            }
+        }  
         SDL_RenderCopy(renderer, black, nullptr, &blackRect);
-        SDL_RenderCopy(renderer, yellow, nullptr, &yellowRect);
+
+        // Establece la posición inicial del fantasma
+
+        // Actualiza la posición del fantasma azul
+        if (blueRect.x < blueDestCol * CELL_SIZE) {
+            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x + blueSpeed) / CELL_SIZE)) {
+                blueRect.x += blueSpeed;
+            } else {
+                blueDestCol = blueRect.x / CELL_SIZE;
+            }
+        } else if (blueRect.x > blueDestCol * CELL_SIZE) {
+            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x - blueSpeed) / CELL_SIZE)) {
+                blueRect.x -= blueSpeed;
+            } else {
+                blueDestCol = blueRect.x / CELL_SIZE;
+            }
+        } else if (blueRect.y < blueDestRow * CELL_SIZE) {
+            if (can_move_to_cell((blueRect.y + blueSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
+                blueRect.y += blueSpeed;
+            } else {
+                blueDestRow = blueRect.y / CELL_SIZE;
+            }
+        } else if (blueRect.y > blueDestRow * CELL_SIZE) {
+            if (can_move_to_cell((blueRect.y - blueSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
+                blueRect.y -= blueSpeed;
+            } else {
+                blueDestRow = blueRect.y / CELL_SIZE;
+            }
+        }  
+        SDL_RenderCopy(renderer, blue, nullptr, &blueRect);
+
+        SDL_Rect xtraRect = { centerX -26 , centerY - 12, 20, 20 };
         SDL_RenderCopy(renderer, xtra, nullptr, &xtraRect);
 
+        SDL_Rect yellowRect = { centerX -2*26 , centerY - 12, 20, 20 };
+        SDL_RenderCopy(renderer, yellow, nullptr, &yellowRect);
+
+        update_blue_position(blueRect, blueDestRow, blueDestCol, blueSpeed/15);
            
         // Dibuja al jugador en la posición actual si está en una celda azul
         if (maze[playerRect.y / CELL_SIZE][playerRect.x / CELL_SIZE] == 0) {
@@ -224,6 +310,7 @@ int main(int argc, char* args[]) {
             // Remover la moneda de la lista y sumar puntos
             coins.erase(coins.begin() + i);
             score += 1;
+
         }else if (SDL_HasIntersection(&playerRect, &blueRect)) {
             SDL_DestroyTexture(blue);
 

@@ -7,3 +7,5 @@ Consiste en un personaje circular y amarillo, el cual debe recorrer un tablero y
 
 Instalar sudo apt-get install libsdl2-ttf-dev
 y utilizar g++ maze.cpp -o test `sdl2-config --cflags --libs` -lSDL2_image -lSDL2_ttf para compilar
+
+PacManCE-main
