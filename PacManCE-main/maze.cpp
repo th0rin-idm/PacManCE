@@ -29,28 +29,28 @@ int maze[NUM_ROWS][NUM_COLS] = { //12 x 12
 int **maze=SelectMap();
 
 // Función para actualizar la posición del fantasma
-void update_blue_position(SDL_Rect& blueRect, int& blueDestRow, int& blueDestCol, int blueSpeed) {
+void update_ghost_position(SDL_Rect& blueRect, int& DestRow, int& DestCol, int GhostSpeed) {
     // Calcula la dirección del fantasma (arriba, abajo, izquierda o derecha)
-    int rowDiff = blueDestRow - (blueRect.y / CELL_SIZE);
-    int colDiff = blueDestCol - (blueRect.x / CELL_SIZE);
+    int rowDiff = DestRow - (blueRect.y / CELL_SIZE);
+    int colDiff = DestCol - (blueRect.x / CELL_SIZE);
 
     if (rowDiff == 0 && colDiff == 0) {
         // Si el fantasma ya está en su destino, elige un nuevo destino al azar
-        blueDestRow = rand() % NUM_ROWS;
-        blueDestCol = rand() % NUM_COLS;
+        DestRow = rand() % NUM_ROWS;
+        DestCol = rand() % NUM_COLS;
     } else {
         // Mueve el fantasma en la dirección del destino
         if (abs(rowDiff) >= abs(colDiff)) {
             if (rowDiff > 0) {
-                blueRect.y += blueSpeed;
+                blueRect.y += GhostSpeed;
             } else {
-                blueRect.y -= blueSpeed;
+                blueRect.y -= GhostSpeed;
             }
         } else {
             if (colDiff > 0) {
-                blueRect.x += blueSpeed;
+                blueRect.x += GhostSpeed;
             } else {
-                blueRect.x -= blueSpeed;
+                blueRect.x -= GhostSpeed;
             }
         }
     }
@@ -90,53 +90,47 @@ int main(int argc, char* args[]) {
     }
     // Convierte la superficie del jugador en una textura del jugador
     SDL_Texture* pacman = SDL_CreateTextureFromSurface(renderer, pacmanSurface);
-    SDL_FreeSurface(pacmanSurface); // ya no se necesita la superficie
-
-    // Establece la posición inicial del jugador
-    SDL_Rect playerRect;
+    SDL_FreeSurface(pacmanSurface); // ya no se necesita la superficie    
+    SDL_Rect playerRect; // Establece la posición inicial del jugador
     playerRect.x = 45;
     playerRect.y = 100;
     playerRect.w = 20;
     playerRect.h = 20;
+
+    int DestRow = 6; // Fila de destino del fantasma azul
+    int DestCol = 4; // Columna de destino del fantasma azul
+    int GhostSpeed = 1; // Velocidad de movimiento del fantasma azul
+
 
     SDL_Surface* blueSurface = IMG_Load("sprites/blue.png");
     if (!blueSurface) {
         printf("No se pudo cargar la imagen del azul: %s\n", SDL_GetError());
         return 1;
     }
-    // Convierte la superficie del fantasma en una textura
+    //Convierte la superficie del fantasma en una textura
     SDL_Texture* blue = SDL_CreateTextureFromSurface(renderer, blueSurface);
     SDL_FreeSurface(blueSurface); // ya no se necesita la superficie
-
-    // Establece la posición inicial del fantasma
-    SDL_Rect blueRect;
+    SDL_Rect blueRect; // Establece la posición inicial blue
     blueRect.x = 45;
     blueRect.y = 150;
     blueRect.w = 20;
     blueRect.h = 20;
 
-    int blueDestRow = 6; // Fila de destino del fantasma azul
-    int blueDestCol = 4; // Columna de destino del fantasma azul
-    int blueSpeed = 1; // Velocidad de movimiento del fantasma azul
 
     SDL_Surface* blackSurface = IMG_Load("sprites/black.png");
     if (!blackSurface) {
         printf("No se pudo cargar la imagen del negro: %s\n", SDL_GetError());
         return 1;
     }
-    // Convierte la superficie del fantasma en una textura
+    //Convierte la superficie del fantasma en una textura
     SDL_Texture* black = SDL_CreateTextureFromSurface(renderer, blackSurface);
     SDL_FreeSurface(blackSurface); // ya no se necesita la superficie
-
     SDL_Rect blackRect;
     blackRect.x = 35;
-    blackRect.y = 150;
+    blackRect.y = 160;
     blackRect.w = 20;
     blackRect.h = 20;
 
-    int blackDestRow = 6; // Fila de destino del fantasma azul
-    int blackDestCol = 4; // Columna de destino del fantasma azul
-    int blackSpeed = 1; // Velocidad de movimiento del fantasma azul
 
     SDL_Surface* yellowSurface = IMG_Load("sprites/yellow.png");
     if (!yellowSurface) {
@@ -146,6 +140,12 @@ int main(int argc, char* args[]) {
     // Convierte la superficie del fantasma en una textura
     SDL_Texture* yellow = SDL_CreateTextureFromSurface(renderer, yellowSurface);
     SDL_FreeSurface(yellowSurface); // ya no se necesita la superficie
+    SDL_Rect yellowRect;
+    yellowRect.x = 35;
+    yellowRect.y = 170;
+    yellowRect.w = 20;
+    yellowRect.h = 20;
+
 
     SDL_Surface* xtraSurface = IMG_Load("sprites/xtra.png");
     if (!xtraSurface) {
@@ -155,6 +155,11 @@ int main(int argc, char* args[]) {
     // Convierte la superficie del fantasma en una textura
     SDL_Texture* xtra = SDL_CreateTextureFromSurface(renderer, xtraSurface);
     SDL_FreeSurface(xtraSurface); // ya no se necesita la superficie
+    SDL_Rect xtraRect;
+    xtraRect.x = 35;
+    xtraRect.y = 180;
+    xtraRect.w = 20;
+    xtraRect.h = 20;
 
     //Cargar la imagen de las monedas
     SDL_Texture* coinTexture = IMG_LoadTexture(renderer, "sprites/coin.png");
@@ -162,7 +167,7 @@ int main(int argc, char* args[]) {
     //vector para guardar las monedas
     std::vector<SDL_Rect> coins;
     int score=0;
-    int life=0;
+    int life=3;
     int level=0;
     int maxcoins=0;
 
@@ -201,6 +206,8 @@ int main(int argc, char* args[]) {
             }
         }
 
+        SDL_RenderClear(renderer);
+
         for (int row = 0; row < 12; row++) {
             for (int col = 0; col < 12; col++) {
                 if (maze[row][col] == 1) { //se hace negra
@@ -233,72 +240,41 @@ int main(int argc, char* args[]) {
     SDL_RenderCopy(renderer, coinTexture, nullptr, &coin);
             }   
         //Dibujar los fantasmas
-        // Actualiza la posición del fantasma negro
-        if (blackRect.x < blackDestCol * CELL_SIZE) {
-            if (can_move_to_cell(blackRect.y / CELL_SIZE, (blackRect.x + blackSpeed) / CELL_SIZE)) {
-                blackRect.x += blackSpeed;
-            } else {
-                blueDestCol = blueRect.x / CELL_SIZE;
-            }
-        } else if (blackRect.x > blackDestCol * CELL_SIZE) {
-            if (can_move_to_cell(blackRect.y / CELL_SIZE, (blackRect.x - blackSpeed) / CELL_SIZE)) {
-                blackRect.x -= blackSpeed;
-            } else {
-                blackDestCol = blackRect.x / CELL_SIZE;
-            }
-        } else if (blackRect.y < blackDestRow * CELL_SIZE) {
-            if (can_move_to_cell((blackRect.y + blackSpeed) / CELL_SIZE, blackRect.x / CELL_SIZE)) {
-                blackRect.y += blackSpeed;
-            } else {
-                blackDestRow = blackRect.y / CELL_SIZE;
-            }
-        } else if (blueRect.y > blueDestRow * CELL_SIZE) {
-            if (can_move_to_cell((blueRect.y - blackSpeed) / CELL_SIZE, blackRect.x / CELL_SIZE)) {
-                blackRect.y -= blackSpeed;
-            } else {
-                blackDestRow = blackRect.y / CELL_SIZE;
-            }
-        }  
-        SDL_RenderCopy(renderer, black, nullptr, &blackRect);
-
-        // Establece la posición inicial del fantasma
-
         // Actualiza la posición del fantasma azul
-        if (blueRect.x < blueDestCol * CELL_SIZE) {
-            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x + blueSpeed) / CELL_SIZE)) {
-                blueRect.x += blueSpeed;
+        
+        if (blueRect.x < DestCol * CELL_SIZE) {
+            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x + GhostSpeed) / CELL_SIZE)) {
+                blueRect.x += GhostSpeed;
             } else {
-                blueDestCol = blueRect.x / CELL_SIZE;
+                DestCol = blueRect.x / CELL_SIZE;
             }
-        } else if (blueRect.x > blueDestCol * CELL_SIZE) {
-            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x - blueSpeed) / CELL_SIZE)) {
-                blueRect.x -= blueSpeed;
+        } else if (blueRect.x > DestCol * CELL_SIZE) {
+            if (can_move_to_cell(blueRect.y / CELL_SIZE, (blueRect.x - GhostSpeed) / CELL_SIZE)) {
+                blueRect.x -= GhostSpeed;
             } else {
-                blueDestCol = blueRect.x / CELL_SIZE;
+                DestCol = blueRect.x / CELL_SIZE;
             }
-        } else if (blueRect.y < blueDestRow * CELL_SIZE) {
-            if (can_move_to_cell((blueRect.y + blueSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
-                blueRect.y += blueSpeed;
+        } else if (blueRect.y < DestRow * CELL_SIZE) {
+            if (can_move_to_cell((blueRect.y + GhostSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
+                blueRect.y += GhostSpeed;
             } else {
-                blueDestRow = blueRect.y / CELL_SIZE;
+                DestRow = blueRect.y / CELL_SIZE;
             }
-        } else if (blueRect.y > blueDestRow * CELL_SIZE) {
-            if (can_move_to_cell((blueRect.y - blueSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
-                blueRect.y -= blueSpeed;
+        } else if (blueRect.y > DestRow * CELL_SIZE) {
+            if (can_move_to_cell((blueRect.y - GhostSpeed) / CELL_SIZE, blueRect.x / CELL_SIZE)) {
+                blueRect.y -= GhostSpeed;
             } else {
-                blueDestRow = blueRect.y / CELL_SIZE;
+                DestRow = blueRect.y / CELL_SIZE;
             }
         }  
         SDL_RenderCopy(renderer, blue, nullptr, &blueRect);
-
-        SDL_Rect xtraRect = { centerX -26 , centerY - 12, 20, 20 };
+        SDL_RenderCopy(renderer, black, nullptr, &blackRect);
+        SDL_RenderCopy(renderer, yellow, nullptr, &yellowRect);
         SDL_RenderCopy(renderer, xtra, nullptr, &xtraRect);
 
-        SDL_Rect yellowRect = { centerX -2*26 , centerY - 12, 20, 20 };
-        SDL_RenderCopy(renderer, yellow, nullptr, &yellowRect);
 
-        update_blue_position(blueRect, blueDestRow, blueDestCol, blueSpeed/15);
-           
+        update_ghost_position(blueRect, DestRow, DestCol, GhostSpeed/15);
+
         // Dibuja al jugador en la posición actual si está en una celda azul
         if (maze[playerRect.y / CELL_SIZE][playerRect.x / CELL_SIZE] == 0) {
             SDL_RenderCopy(renderer, pacman, NULL, &playerRect);
@@ -309,19 +285,17 @@ int main(int argc, char* args[]) {
         if (SDL_HasIntersection(&playerRect, &coins[i])) {
             // Remover la moneda de la lista y sumar puntos
             coins.erase(coins.begin() + i);
-            score += 1;
+            score += 10;
 
-        }else if (SDL_HasIntersection(&playerRect, &blueRect)) {
-            SDL_DestroyTexture(blue);
-
-        }else if (SDL_HasIntersection(&playerRect, &blackRect)) {
-            SDL_DestroyTexture(black);
-
-        }else if (SDL_HasIntersection(&playerRect, &yellowRect)) {
-            SDL_DestroyTexture(yellow);
-
-        }else if (SDL_HasIntersection(&playerRect, &xtraRect)) {
-            SDL_DestroyTexture(xtra);
+        }else if (SDL_HasIntersection(&playerRect, &blueRect) || 
+                  SDL_HasIntersection(&playerRect, &blackRect)|| 
+                  SDL_HasIntersection(&playerRect, &xtraRect) || 
+                  SDL_HasIntersection(&playerRect, &yellowRect)){
+            life -=1;
+            
+        }else if(life < -15000){
+            SDL_DestroyTexture(pacman);
+            quit = true;
         }
     }
         SDL_Color textColor = { 255, 255, 255 }; // Color blanco para el texto
@@ -345,10 +319,17 @@ int main(int argc, char* args[]) {
         SDL_Texture* lifeTexture = SDL_CreateTextureFromSurface(renderer, lifeSurface);
         SDL_FreeSurface(lifeSurface);
 
+        // Borrar el puntaje viejo
+        SDL_Rect oldScoreRect = { SCREEN_WIDTH - 150, 10, 0, 0 };
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Establecer el color de relleno a negro
+        SDL_RenderFillRect(renderer, &oldScoreRect);
+
         // Dibujar las texturas en la ventana
         SDL_Rect scoreRect = { SCREEN_WIDTH - 150, 10, 0, 0 }; // Posición del puntaje en la ventana
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreRect.w, &scoreRect.h);
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreRect);
+
+
 
         SDL_Rect levelRect = { SCREEN_WIDTH  - 150, 50, 0, 0 }; // Posición del nivel en la ventana
         SDL_QueryTexture(levelTexture, NULL, NULL, &levelRect.w, &levelRect.h);
