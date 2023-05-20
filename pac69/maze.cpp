@@ -154,7 +154,7 @@ int main(int argc, char* args[]) {
     int centerX;
     int centerY;
 
-    // Carga la imagen del jugador
+    // Carga la imagen del poder
     SDL_Surface* cherrySurface = IMG_Load("sprites/cherry.png");
     if (!cherrySurface) {
         printf("No se pudo cargar la imagen de cherry: %s\n", SDL_GetError());
@@ -257,6 +257,14 @@ int main(int argc, char* args[]) {
     int level=0;
     int maxcoins=0;
 
+    //Cargar la imagen de los poderes
+    SDL_Texture* PowerTexture = IMG_LoadTexture(renderer, "sprites/cherry.png");
+    int powerActive;
+    //vector para guardar los poderes y puedan funcionar
+    std::vector<SDL_Rect> powers;
+
+    int powerPlayer;
+
     while (!quit){
 
         SDL_Event event;
@@ -321,7 +329,8 @@ int main(int argc, char* args[]) {
                         VentanaEmergente ventana;
                         ventana.Mostrar();
                     }
-                }else{//blanco o eso queria pero printea negro igual xd
+
+                }else {//blanco o eso queria pero printea negro igual xd
                 //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                 }
                 rect.x = col * CELL_SIZE;
@@ -335,10 +344,40 @@ int main(int argc, char* args[]) {
         }if(life==1){
             strike2=true;
         }
+        if(score==200 || score ==400 || score == 600 || score == 800  || score == 1000){
+            int powerx=rand() % 10;
+            int powery=rand() % 10;powery+=2;powerx+=2;
+            //printf("1 Número aleatorio entre 0 y 12: %d\n", powerx);
+            //printf("2 Número aleatorio entre 0 y 12: %d\n", powery);
+            for (int row = 0; row < 12; row++) {
+                if(powerActive==1){break;}
+            for (int col = 0; col < 12; col++) {
+                if (maze[powerx][powery] == 0) { //encontro un lugar disponible para printear el poder
+                    centerX = rect.x + CELL_SIZE/2;
+                    centerY = rect.y + CELL_SIZE/2;
+                    int Power_Size= 22;
+                    SDL_Rect powerRect = { centerX, centerY, Power_Size, Power_Size };
+                    powers.push_back(powerRect);
+                    powerActive=1;
+                    break;
+                } else if(maze[powerx][powery]==1){ //No se puede ingresar el objeto por lo cual continua buscando
+                   
+                    }
+                    rect.x = col * CELL_SIZE;
+                    rect.y = row * CELL_SIZE;
+                }
+        }
+        }
+        //dibujar los poderes
+        for (const auto& power : powers) {
+        SDL_RenderCopy(renderer, cherry, nullptr, &power);
+            }   
         // Dibujar las monedas
         for (const auto& coin : coins) {
     SDL_RenderCopy(renderer, coinTexture, nullptr, &coin);
-            }   
+            }
+
+
         //Dibujar los fantasmas
         // Actualiza la posición del fantasma azul
         
@@ -380,7 +419,7 @@ int main(int argc, char* args[]) {
                 if(score>=300){
                     SDL_RenderCopy(renderer, black, nullptr, &blackRect);
                     if(score>=350){
-                        SDL_RenderCopy(renderer, cherry, nullptr, &cherryRect);
+                        //SDL_RenderCopy(renderer, cherry, nullptr, &cherryRect);
                     }
                 }
             }
@@ -416,13 +455,20 @@ int main(int argc, char* args[]) {
         }else if(SDL_HasIntersection(&playerRect, &xtraRect) && power==true){
             SDL_DestroyTexture(xtra);
         }
-        
+         // Verificar si el jugador colisionó con un poder
+    for (int i = 0; i < powers.size(); i++) {
+        if (SDL_HasIntersection(&playerRect, &powers[i])) {
+            // Remover el poder de la ventana y darle poder al jugador
+            powers.erase(powers.begin() + i);
+            powerPlayer=1;
+            }
+    }
         // Verificar si el jugador colisionó con una moneda
     for (int i = 0; i < coins.size(); i++) {
         if (SDL_HasIntersection(&playerRect, &coins[i])) {
             // Remover la moneda de la lista y sumar puntos
             coins.erase(coins.begin() + i);
-            score += 5;
+            score += 10;
 
         }
     }
