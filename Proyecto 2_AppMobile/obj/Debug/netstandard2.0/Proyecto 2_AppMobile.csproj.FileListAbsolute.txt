@@ -1,0 +1,15 @@
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.csproj.AssemblyReference.cache
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\App.xaml.g.cs
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\MainPage.xaml.g.cs
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.AssemblyInfoInputs.cache
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.AssemblyInfo.cs
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.csproj.CoreCompileInputs.cache
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\bin\Debug\netstandard2.0\Proyecto 2_AppMobile.deps.json
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\bin\Debug\netstandard2.0\Proyecto 2_AppMobile.dll
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\bin\Debug\netstandard2.0\Proyecto 2_AppMobile.pdb
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\XamlC.stamp
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.dll
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\refint\Proyecto 2_AppMobile.dll
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\Proyecto 2_AppMobile.pdb
+C:\Users\Nacho\source\repos\Proyecto 2_AppMobile\Proyecto 2_AppMobile\Proyecto 2_AppMobile\obj\Debug\netstandard2.0\ref\Proyecto 2_AppMobile.dll

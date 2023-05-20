@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Proyecto_2_AppMobile.MainPage">
+
+    <StackLayout>
+        <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
+            <Label Text="Welcome to PacmanCE" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+        </Frame>
+        <Label Text="Si el juego no ha iniciado apareceran todos los puntajes en 999" FontSize="Title" Padding="30,10,30,10"/>
+        <Label Text="Asegura de tener el puerto 5001 disponible para que las aplicaciones no tengan problema" FontSize="16" Padding="30,0,30,0"/>
+        <Label x:Name="lblLevel" Text="Nivel: " />
+        <Label x:Name="lblScore" Text="Puntaje: " />
+        <Label x:Name="lblLife" Text="Vida restante: " />
+        <Label x:Name="AddressIP" Text="La aplicacion mobile esta en la IP: " />
+        <Label x:Name="Address" Text="La aplicacion mobile esta en la IP: " />
+
+        <Label Text="Dirección IP del servidor:" />
+        <Entry x:Name="ipEntry" Text="127.0.0.1" />
+        <Button Text="Conectar" Clicked="ConnectButton_Clicked" />
+        <Label x:Name="statusLabel" />
+        
+        <Label FontSize="16" Padding="30,24,30,0">
+            <Label.FormattedText>
+                <FormattedString>
+                    <FormattedString.Spans>
+                        <Span Text="El giroscopio debe estar funcionando, mueva el celular para poder mover el personaje"/>
+                        <Span Text="Repositorio: https://github.com/th0rin-idm/PacManCE" FontAttributes="Bold"/>
+                    </FormattedString.Spans>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+    </StackLayout>
+
+</ContentPage>
