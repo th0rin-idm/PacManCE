@@ -1,95 +1,98 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#include <vector>
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-const int SQUARE_SIZE = 50;
+struct Posicion {
+    int fila;
+    int columna;
+};
 
-int main(int argc, char* args[]) {
+const int ANCHO_VENTANA = 800;
+const int ALTO_VENTANA = 600;
+const int ANCHO_MATRIZ = 10;
+const int ALTO_MATRIZ = 10;
+const int ANCHO_CELDA = ANCHO_VENTANA / ANCHO_MATRIZ;
+const int ALTO_CELDA = ALTO_VENTANA / ALTO_MATRIZ;
 
-    // Inicializar SDL
+// Función para dibujar una imagen en la ventana
+void dibujarImagen(SDL_Renderer* renderer, SDL_Texture* textura, int posX, int posY)
+{
+    SDL_Rect destino;
+    destino.x = posX;
+    destino.y = posY;
+    SDL_QueryTexture(textura, NULL, NULL, &destino.w, &destino.h);
+    SDL_RenderCopy(renderer, textura, NULL, &destino);
+}
+
+int main()
+{
     SDL_Init(SDL_INIT_VIDEO);
 
-    // Inicializar SDL_image
-    IMG_Init(IMG_INIT_PNG);
+    // Crear la ventana y el renderer
+    SDL_Window* ventana = SDL_CreateWindow("Movimiento en matriz", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ANCHO_VENTANA, ALTO_VENTANA, SDL_WINDOW_SHOWN);
+    SDL_Renderer* renderer = SDL_CreateRenderer(ventana, -1, 0);
 
-    // Crear ventana
-    SDL_Window* window = SDL_CreateWindow("Movimiento de imagen",
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SCREEN_WIDTH, SCREEN_HEIGHT,
-                                          SDL_WINDOW_SHOWN);
+    // Cargar las imágenes
+    SDL_Surface* imagen1 = IMG_Load("sprites/blue.png");
+    SDL_Surface* imagen2 = IMG_Load("sprites/xtra.png");
+    SDL_Texture* textura1 = SDL_CreateTextureFromSurface(renderer, imagen1);
+    SDL_Texture* textura2 = SDL_CreateTextureFromSurface(renderer, imagen2);
 
-    // Crear renderizador
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    // Vectores de posiciones en la matriz para cada imagen
+    std::vector<Posicion> posiciones1;
+    posiciones1.push_back({2, 3});
+    posiciones1.push_back({4, 7});
+    // Agrega las demás posiciones para la imagen 1 según necesites
 
-    // Cargar imagen
-    SDL_Surface* image = IMG_Load("sprites/blue.png");
-    if (!image) {
-        std::cerr << "Error al cargar la imagen: " << IMG_GetError() << std::endl;
-        return 1;
-    }
+    std::vector<Posicion> posiciones2;
+    posiciones2.push_back({6, 1});
+    posiciones2.push_back({8, 5});
+    // Agrega las demás posiciones para la imagen 2 según necesites
 
-    // Crear textura a partir de la imagen
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, image);
+    bool ejecutando = true;
+    SDL_Event evento;
 
-    // Liberar superficie
-    SDL_FreeSurface(image);
-
-    // Definir posición inicial de la imagen
-    int x = SCREEN_WIDTH / 2 - SQUARE_SIZE / 2;
-    int y = SCREEN_HEIGHT / 2 - SQUARE_SIZE / 2;
-
-    // Definir dirección del movimiento
-    int dx = 1;
-    int dy = 1;
-
-    // Bucle principal
-    bool quit = false;
-    while (!quit) {
-
-        // Manejar eventos
-        SDL_Event e;
-        while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
-                quit = true;
+    while (ejecutando)
+    {
+        while (SDL_PollEvent(&evento))
+        {
+            if (evento.type == SDL_QUIT)
+            {
+                ejecutando = false;
+                break;
             }
         }
 
-        // Actualizar posición
-        x += dx;
-        y += dy;
-
-        // Cambiar dirección si llega al borde
-        if (x <= 0 || x >= SCREEN_WIDTH - SQUARE_SIZE) {
-            dx *= -1;
-        }
-        if (y <= 0 || y >= SCREEN_HEIGHT - SQUARE_SIZE) {
-            dy *= -1;
-        }
-
-        // Limpiar pantalla
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Renderizar imagen
-        SDL_Rect destRect = {x, y, SQUARE_SIZE, SQUARE_SIZE};
-        SDL_RenderCopy(renderer, texture, nullptr, &destRect);
+        // Dibujar las imágenes en las posiciones correspondientes
+        for (const auto& posicion : posiciones1)
+        {
+            int posX = posicion.columna * ANCHO_CELDA;
+            int posY = posicion.fila * ALTO_CELDA;
+            dibujarImagen(renderer, textura1, posX, posY);
+        }
 
-        // Actualizar pantalla
+        for (const auto& posicion : posiciones2)
+        {
+            int posX = posicion.columna * ANCHO_CELDA;
+            int posY = posicion.fila * ALTO_CELDA;
+            dibujarImagen(renderer, textura2, posX, posY);
+        }
+
         SDL_RenderPresent(renderer);
-
-        // Esperar un poco
-        SDL_Delay(10);
     }
 
-    // Liberar recursos
-    SDL_DestroyTexture(texture);
+    SDL_DestroyTexture(textura1);
+    SDL_DestroyTexture(textura2);
+    SDL_FreeSurface(imagen1);
+    SDL_FreeSurface(imagen2);
     SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    IMG_Quit();
+    SDL_DestroyWindow(ventana);
     SDL_Quit();
 
     return 0;
 }
+

@@ -12,7 +12,7 @@ const int CELL_SIZE = 40;
 const int NUM_ROWS = SCREEN_HEIGHT / CELL_SIZE;
 const int NUM_COLS = SCREEN_WIDTH / CELL_SIZE;
 
-int **maze=SelectMap();
+int **maze=SelectMap(1);
 
 // Función para actualizar la posición del fantasma
 void update_ghost_position(SDL_Rect& blueRect, int& DestRow, int& DestCol, int GhostSpeed) {
@@ -64,6 +64,10 @@ int main(int argc, char* args[]) {
     rect.w = CELL_SIZE;
     rect.h  = CELL_SIZE;
     bool quit = false;
+    bool strike1 =false;
+    bool strike2 = false;
+    bool power=false;
+    int mappeador = 1;
 
     int centerX;
     int centerY;
@@ -78,7 +82,7 @@ int main(int argc, char* args[]) {
     SDL_Texture* cherry = SDL_CreateTextureFromSurface(renderer, cherrySurface);
     SDL_FreeSurface(cherrySurface); // ya no se necesita la superficie    
     SDL_Rect cherryRect; // Establece la posición inicial del jugador
-    cherryRect.x = 45;
+    cherryRect.x = 60;
     cherryRect.y = 100;
     cherryRect.w = 20;
     cherryRect.h = 20;
@@ -126,8 +130,8 @@ int main(int argc, char* args[]) {
     SDL_Texture* black = SDL_CreateTextureFromSurface(renderer, blackSurface);
     SDL_FreeSurface(blackSurface); // ya no se necesita la superficie
     SDL_Rect blackRect;
-    blackRect.x = 35;
-    blackRect.y = 160;
+    blackRect.x = 60;
+    blackRect.y = 150;
     blackRect.w = 20;
     blackRect.h = 20;
 
@@ -141,8 +145,8 @@ int main(int argc, char* args[]) {
     SDL_Texture* yellow = SDL_CreateTextureFromSurface(renderer, yellowSurface);
     SDL_FreeSurface(yellowSurface); // ya no se necesita la superficie
     SDL_Rect yellowRect;
-    yellowRect.x = 35;
-    yellowRect.y = 170;
+    yellowRect.x = 156;
+    yellowRect.y = 290;
     yellowRect.w = 20;
     yellowRect.h = 20;
 
@@ -156,7 +160,7 @@ int main(int argc, char* args[]) {
     SDL_Texture* xtra = SDL_CreateTextureFromSurface(renderer, xtraSurface);
     SDL_FreeSurface(xtraSurface); // ya no se necesita la superficie
     SDL_Rect xtraRect;
-    xtraRect.x = 35;
+    xtraRect.x = 60;
     xtraRect.y = 180;
     xtraRect.w = 20;
     xtraRect.h = 20;
@@ -224,8 +228,15 @@ int main(int argc, char* args[]) {
                     if(maxcoins<80){
                     coins.push_back(coinRect);
                     maxcoins++;
-                    }else if(score==400){ 
+                    }else if(score==400 || score==800 || score==1200 || score==1600){ 
                         maxcoins=0;
+                        mappeador++;
+                        if(mappeador<5){
+                            maze=SelectMap(mappeador);
+                        }
+                        
+                    }if(score==2000){
+                        //Ganaste el juego
                     }
                 }else{//blanco o eso queria pero printea negro igual xd
                 //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -236,7 +247,11 @@ int main(int argc, char* args[]) {
                 SDL_RenderFillRect(renderer, &rect);
             }
         }
-        
+        if(life==2){
+            strike1 = true;
+        }if(life==1){
+            strike2=true;
+        }
         // Dibujar las monedas
         for (const auto& coin : coins) {
     SDL_RenderCopy(renderer, coinTexture, nullptr, &coin);
@@ -292,6 +307,31 @@ int main(int argc, char* args[]) {
         if (maze[playerRect.y / CELL_SIZE][playerRect.x / CELL_SIZE] == 0) {
             SDL_RenderCopy(renderer, pacman, NULL, &playerRect);
         }
+
+        if (SDL_HasIntersection(&playerRect, &blueRect) || 
+                  SDL_HasIntersection(&playerRect, &blackRect)|| 
+                  SDL_HasIntersection(&playerRect, &xtraRect) || 
+                  SDL_HasIntersection(&playerRect, &yellowRect) && power==false){
+            if(life==3){
+                life=2;
+            }if(strike1==true && life==2){
+                life=1;
+            }if(life==1 && strike2==true){
+                life=0;
+                //quit=true;
+            }
+        }else if(SDL_HasIntersection(&playerRect, &cherryRect)){
+            //SDL_DestroyTexture(cherry);
+            power==true;
+        }else if(SDL_HasIntersection(&playerRect, &blueRect) && power==true){
+            SDL_DestroyTexture(blue);
+        }else if(SDL_HasIntersection(&playerRect, &blackRect) && power==true){
+            SDL_DestroyTexture(black);
+        }else if(SDL_HasIntersection(&playerRect, &yellowRect) && power==true){
+            SDL_DestroyTexture(yellow);
+        }else if(SDL_HasIntersection(&playerRect, &xtraRect) && power==true){
+            SDL_DestroyTexture(xtra);
+        }
         
         // Verificar si el jugador colisionó con una moneda
     for (int i = 0; i < coins.size(); i++) {
@@ -300,12 +340,6 @@ int main(int argc, char* args[]) {
             coins.erase(coins.begin() + i);
             score += 5;
 
-        }else if (SDL_HasIntersection(&playerRect, &blueRect) || 
-                  SDL_HasIntersection(&playerRect, &blackRect)|| 
-                  SDL_HasIntersection(&playerRect, &xtraRect) || 
-                  SDL_HasIntersection(&playerRect, &yellowRect)){
-            life=2;
-            
         }
     }
         SDL_Color textColor = { 255, 255, 255 }; // Color blanco para el texto

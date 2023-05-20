@@ -2,7 +2,7 @@
 #include <iostream>
 #include <ctime> // necesario para obtener una semilla aleatoria
 
-int  **SelectMap(void){
+int  **SelectMap(int random){
     int maze1[12][12] = { //12 x 12
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1},
@@ -75,13 +75,14 @@ int maze5[12][12] = { //12 x 12
 };
     int **maze;
     // establecemos la semilla aleatoria
-   std::srand(std::time(nullptr));
+   /*std::srand(std::time(nullptr));
    // generamos un número aleatorio entre 0 y 4 (ambos incluidos)
-   int random = std::rand() % 5;
+   int random = std::rand() % 5;*/
    // sumamos 1 para obtener un número aleatorio entre 1 y 5 (ambos incluidos)
-   random += 1;
+   //int random =0;
+   //random += 1;
     //printf("%d",random);
-    std::cout << "Número aleatorio entre 1 y 5: " << random << std::endl;
+    //std::cout << "Número aleatorio entre 1 y 5: " << random << std::endl;
     if(random==1){
         // Copiar la matriz original a la matriz copia
            maze = new int *[12];
